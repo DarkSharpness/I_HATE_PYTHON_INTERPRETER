@@ -1,0 +1,4 @@
+/mnt/f/Code/Github/I_HATE_PYTHON_INTERPRETER/CMakeFiles/antlr4-cpp-runtime.dir
+/mnt/f/Code/Github/I_HATE_PYTHON_INTERPRETER/CMakeFiles/code.dir
+/mnt/f/Code/Github/I_HATE_PYTHON_INTERPRETER/CMakeFiles/edit_cache.dir
+/mnt/f/Code/Github/I_HATE_PYTHON_INTERPRETER/CMakeFiles/rebuild_cache.dir

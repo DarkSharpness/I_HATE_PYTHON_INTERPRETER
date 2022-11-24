@@ -4,6 +4,8 @@ cmake-build-debug/
 build/
 gen/
 antlr-playground/.antlr
+.cache/
+.vscode/
 
 # Testcases
 testcases/hidden-testcases

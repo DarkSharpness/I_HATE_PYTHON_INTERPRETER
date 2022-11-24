@@ -197,7 +197,8 @@ antlrcpp::Any EvalVisitor::visitAtom_expr(Python3Parser::Atom_exprContext *ctx) 
                 // std::cout << "Return!\n";
                 ans = ans.as<Return_Type>().data;
                 // std::cout << "Test out:" << ans << '\n';
-            } else {std::cout << "Fatal Error of Return!!!\n";}
+            } else {} // No return value
+            //{std::cout << "Fatal Error of Return!!!\n";}
             // std::cout << "RemoveSpace:" << scope.scope.size() << '\n';
             scope.deleteSpace();
             return ans;
@@ -304,7 +305,7 @@ antlrcpp::Any EvalVisitor::visitTypedargslist(Python3Parser::TypedargslistContex
 
 /// @brief No need to overwrite. It won't be reached
 antlrcpp::Any EvalVisitor::visitTfpdef(Python3Parser::TfpdefContext *ctx){
-    std::cout << "Error:visitTfdef\n";
+    // std::cout << "Error:visitTfdef\n";
     return visitChildren(ctx);
 }
 /// @brief Doing Nothing.Done.
@@ -319,20 +320,20 @@ antlrcpp::Any EvalVisitor::visitFile_input(Python3Parser::File_inputContext *ctx
 
 /// @brief No need to overwrite. It won't be reached 
 antlrcpp::Any EvalVisitor::visitComp_op(Python3Parser::Comp_opContext *ctx){
-    std::cout << "Error: Comp\n";
+    // std::cout << "Error: Comp\n";
     return visitChildren(ctx);
 }
 
 
 /// @brief No need to overwrite. It won't be reached 
 antlrcpp::Any EvalVisitor::visitAddorsub_op(Python3Parser::Addorsub_opContext *ctx){
-    std::cout << "Error: ADD\n";
+    // std::cout << "Error: ADD\n";
     return visitChildren(ctx);
 }
 
 /// @brief No need to overwrite. It won't be reached 
 antlrcpp::Any EvalVisitor::visitMuldivmod_op(Python3Parser::Muldivmod_opContext *ctx){
-    std::cout << "Error: MULT\n";
+    // std::cout << "Error: MULT\n";
     return visitChildren(ctx);
 }
 
@@ -472,7 +473,7 @@ antlrcpp::Any EvalVisitor::visitSuite(Python3Parser::SuiteContext *ctx) {
 
 
 antlrcpp::Any EvalVisitor::visitIf_stmt(Python3Parser::If_stmtContext *ctx) {
-    if(!ctx->IF()) {std::cout << "NO IF EXCEPTION\n"; return {};}// Exception!!!
+    // if(!ctx->IF()) {std::cout << "NO IF EXCEPTION\n"; return {};}// Exception!!!
     auto testVec = ctx->test();
     for(int i = 0 ; i < testVec.size() ; ++i) {
         if(AnyToBool(visitTest(testVec[i]))) {
