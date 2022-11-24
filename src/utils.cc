@@ -5,6 +5,7 @@
 #include "Scope.h"
 #include "support/Any.h"
 #include "utils.h"
+#include <cmath>
 #include <ostream>
 
 NameSpace scope;
@@ -263,7 +264,10 @@ antlrcpp::Any& operator /=(antlrcpp::Any &X,const antlrcpp::Any &Y) {
 
 
 antlrcpp::Any operator |(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
-    return AnyToInt(X) / AnyToInt(Y);
+    auto tmp1 = AnyToInt(X),tmp2 = AnyToInt(Y);
+    auto ans = tmp1 % tmp2;
+    ans = ans >=0 ? ans : ans + abs(tmp2);
+    return (tmp1 - ans) / tmp2;
 }
 
 antlrcpp::Any& operator |=(antlrcpp::Any &X,const antlrcpp::Any &Y) {
@@ -284,7 +288,9 @@ antlrcpp::Any& operator |=(antlrcpp::Any &X,const antlrcpp::Any &Y) {
 
 
 antlrcpp::Any operator %(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
-    return AnyToInt(X) % AnyToInt(Y);
+    auto tmp = AnyToInt(Y);
+    auto ans = AnyToInt(X) % tmp;
+    return ans >= 0 ? ans : ans + abs(tmp) ;
 }
 
 
@@ -360,7 +366,7 @@ std::ostream& operator <<(std::ostream& os,const antlrcpp::Any &X) {
     else if(X.is<double>())      {os << X.as<double>();}
     else if(X.is<bool>()) {
         os << (X.as<bool>() ? "True" : "False");
-    } else {os << "WTF is it!!!!!!!!!!!";} // UNEXPECTED ERROR
+    } else {/*os << "WTF is it!!!!!!!!!!!";*/} // UNEXPECTED ERROR
     return os;
 }
 

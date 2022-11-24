@@ -504,15 +504,15 @@ antlrcpp::Any EvalVisitor::visitWhile_stmt(Python3Parser::While_stmtContext *ctx
 
 // No need TO write
 antlrcpp::Any EvalVisitor::visitBreak_stmt(Python3Parser::Break_stmtContext *ctx){
-    std::cout << "Error: Break\n";
+    // std::cout << "Error: Break\n";
     return visitChildren(ctx);
 }
 antlrcpp::Any EvalVisitor::visitContinue_stmt(Python3Parser::Continue_stmtContext *ctx){
-    std::cout << "Error: Continue\n";
+    // std::cout << "Error: Continue\n";
     return visitChildren(ctx);
 }
 antlrcpp::Any EvalVisitor::visitReturn_stmt(Python3Parser::Return_stmtContext *ctx){
-    std::cout << "Error: Return\n";
+    // std::cout << "Error: Return\n";
     return visitChildren(ctx);
 }
 
