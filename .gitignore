@@ -3,10 +3,11 @@
 cmake-build-debug/
 build/
 gen/
-antlr-playground/.antlr
+antlr-playground/
 .cache/
 .vscode/
-third_party/
+testcases/
+
 
 # Testcases
 testcases/hidden-testcases
