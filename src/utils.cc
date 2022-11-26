@@ -356,7 +356,9 @@ std::ostream& operator <<(std::ostream& os,const antlrcpp::Any &X) {
     else if(X.is<double>())      {os << X.as<double>();}
     else if(X.is<bool>()) {
         os << (X.as<bool>() ? "True" : "False");
-    } else {/*os << "WTF is it!!!!!!!!!!!";*/} // UNEXPECTED ERROR
+    } else if(X.is<None_Type>()){
+        os << "None";
+    }else {os << "FUCKING ERORR IN UTILS.CC";} // UNEXPECTED ERROR
     return os;
 }
 

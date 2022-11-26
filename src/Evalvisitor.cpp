@@ -232,7 +232,7 @@ antlrcpp::Any EvalVisitor::visitAtom(Python3Parser::AtomContext *ctx) {
     } else if(ctx->FALSE()) {
         return false;
     } else if(ctx->NONE()) {
-        return nullptr;
+        return None_Type();
     } else if(ctx->test()) {
         return visitTest(ctx->test());
     } else {

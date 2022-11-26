@@ -6,6 +6,7 @@ gen/
 antlr-playground/.antlr
 .cache/
 .vscode/
+third_party/
 
 # Testcases
 testcases/hidden-testcases

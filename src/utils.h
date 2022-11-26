@@ -23,6 +23,7 @@ struct Para_Type {
     Para_Type(const std::string &str,const antlrcpp::Any &v):name(str),val(v){}
 };
 
+struct None_Type {};
 
 // Basic Function type.
 struct function {

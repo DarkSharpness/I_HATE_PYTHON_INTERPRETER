@@ -332,7 +332,7 @@ class int2048 : public array <uint64_t>  {
     }
 
     /* Subtract X's abs value by 1.
-    Note that X != 0 */
+       Note that X != 0 */
     friend int2048 &SelfSub(int2048 &X) {
         for(size_t i = 0 ; i != X.size() ; ++i) {
             if(--X[i] < base) break;
@@ -345,7 +345,7 @@ class int2048 : public array <uint64_t>  {
     /* X = X + 1 */
     friend int2048 &operator ++(int2048 &X) {
         if(X.back() == 1 && X.size() == 1 && X.sign) { // -1 case
-            X[0] = X.sign = 0;
+            X[0] = X.sign = false;
             return X;
         } return X.sign ? SelfSub(X) : SelfAdd(X);
     }
@@ -356,7 +356,7 @@ class int2048 : public array <uint64_t>  {
             X[0] = X.sign = 1;
             return X;
         } else if(X.back() == 1 && X.size() == 1 && !X.sign){
-            X[0] = X.sign = 0;
+            X[0] = X.sign = false;
             return X;
         } else return X.sign ? SelfAdd(X) : SelfSub(X);
     }
@@ -367,6 +367,16 @@ class int2048 : public array <uint64_t>  {
     inline int2048 &reverse() {
         sign ^= 1;
         return *this;
+    }
+
+    inline int2048 &setSign(bool flag) {
+        sign = flag;
+        return *this;
+    }
+
+    friend inline int2048 abs(int2048 &&tmp) {
+        tmp.sign = false;
+        return tmp;
     }
 
     /* X * (-1) */
@@ -463,6 +473,23 @@ class int2048 : public array <uint64_t>  {
         return X;
     }
 
+    friend int2048 &Mult_Lo(int2048 &X,int64_t Y) {
+        uint64_t ret = 0;
+        for(size_t i = 0 ; i < X.size() ; ++i) {
+            ret += X[i] * Y;
+            if(ret >= base) {
+                X[i] = ret % base;
+                ret /= base;
+            } else {
+                X[i] = ret;
+                ret  = 0;
+            }
+        }
+        if(ret) X.push_back(ret);
+        return X;
+    }
+
+
     /* X = X + Y */
     friend int2048& operator +=(int2048 &X,const int2048 &Y) {
         if(X.sign == Y.sign) {
@@ -541,30 +568,29 @@ class int2048 : public array <uint64_t>  {
 
     friend int2048 operator /(const int2048 &X,const int2048 &Y) {
         int32_t cmp = Abs_Compare(X,Y);
-        if(cmp == -1) return 0;
+        if(cmp == -1) return X.sign ^ Y.sign ? -1 : 0;
         if(cmp ==  0) return X.sign ^ Y.sign ? -1 : 1;
-
         uint64_t dif = X.size() - Y.size() * 2;
         if(int64_t(dif) < 0) dif = 0;
 
         // Y.size() + dif is the new length of Y.
         int2048 ans = ((X << dif) * ~(Y << dif)) >> (2 * (dif + Y.size()));
         ans.sign = false;
-
-        // Small adjustments
-        int2048 tmp = (ans + 1) * Y;
-        while(Abs_Compare(tmp,X) != 1) {
+        int2048 ret = (ans + 1) * Y;
+        while(Abs_Compare(ret,X) != 1) {
+            // tmp = (ans + 1) * Y
             SelfAdd(ans);
-            tmp += Y;
+            ret += Y;
         }
-        tmp = ans * Y;
-        while((cmp = Abs_Compare(tmp,X)) == 1) {
+        ret -= Y;
+        while((cmp = Abs_Compare(ret,X)) == 1) { // Ans * 
+            // tmp = ans * Y
             SelfSub(ans);
-            tmp -= Y;
+            ret -= Y;
         }
         ans.sign = X.sign ^ Y.sign;
         if(!cmp || !ans.sign) return ans;
-        else                  return SelfAdd(ans);
+        else return SelfAdd(ans);
     }
 
     friend int2048 &operator /=(int2048 &X,const int2048 &Y) {
@@ -572,7 +598,31 @@ class int2048 : public array <uint64_t>  {
     }
 
     friend int2048 operator %(const int2048 &X,const int2048 &Y) {
-        return X - (X / Y) * Y;
+        int32_t cmp = Abs_Compare(X,Y);
+        if(cmp == -1) return X.sign ^ Y.sign ? X + Y : X;
+        if(cmp ==  0) return 0;
+
+        uint64_t dif = X.size() - Y.size() * 2;
+        if(int64_t(dif) < 0) dif = 0;
+
+        // Y.size() + dif is the new length of Y.
+        int2048 ans = ((X << dif) * ~(Y << dif)) >> (2 * (dif + Y.size()));
+        ans.sign = false;
+        int2048 ret = (ans + 1) * Y;
+        while(Abs_Compare(ret,X) != 1) {
+            // tmp = (ans + 1) * Y
+            SelfAdd(ans);
+            ret += Y;
+        }
+        ret -= Y;
+        while((cmp = Abs_Compare(ret,X)) == 1) { // Ans * 
+            // tmp = ans * Y
+            SelfSub(ans);
+            ret -= Y;
+        }
+        ret.sign = X.sign;
+        if(!cmp) return 0;
+        return X.sign ^ Y.sign ? X - ret + Y : X - ret;
     }
 
     /* The reverser of Y in twice the size() of Y.
@@ -594,16 +644,17 @@ class int2048 : public array <uint64_t>  {
                 ans.push_back(i % base);
                 i /= base;
             }
-    #
             return ans;
         }
 
         size_t hf = 1 + (X.size() >> 1);     // half of X.size()
         int2048 Y = ~(X >> (X.size() - hf)); // First half bits reverse
-
+        int2048 tmp = Y << (X.size() - hf);
+        Mult_Lo(tmp,2);
+        tmp.sign = false;
         // Newton's method Y1 = Y0 * (2 - X * Y0).
         // When multiply Y0 ,it should be Y0 >> (hf << 1) 
-        return 2 * (Y << (X.size() - hf)) - (X * Y * Y >> (hf << 1)); 
+        return tmp - abs(X * Y * Y >> (hf << 1)); 
     }
 
 
@@ -746,11 +797,3 @@ struct int2048_initializer : private int2048{
 
 
 #endif
-
-int main() {
-    sjtu::int2048 x;
-    double t;
-    std::cin >> t;
-    std::cout << (sjtu::dto2048(t))._TOSTRING();
-    return 0;
-}
