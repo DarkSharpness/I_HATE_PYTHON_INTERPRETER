@@ -223,8 +223,10 @@ antlrcpp::Any EvalVisitor::visitAtom(Python3Parser::AtomContext *ctx) {
     if(ctx->NAME()) {
         return scope[ctx->getText()];
     } else if(ctx->NUMBER()) {
-        const std::string &Name = ctx->getText();
+        std::string Name = ctx->getText();
         if(Name.find('.') == -1uLL) {
+            // std::cout << "INT!!!!\n";
+            // std::cout << Name << '\n';
             return StringToInt(Name);
         } else return StringToFloat(Name);
     } else if(ctx->TRUE()) {

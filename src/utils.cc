@@ -300,13 +300,9 @@ antlrcpp::Any& operator %=(antlrcpp::Any &X,const antlrcpp::Any &Y) {
 */
 
 
-antlrcpp::Any operator -(const antlrcpp::Any &X) {
-    if(X.is<double>()) return -X.as<double>();
-    else return -AnyToInt(X);
-}
 antlrcpp::Any operator -(antlrcpp::Any &&X) {
     if(X.is<double>()) return -X.as<double>();
-    else return -AnyToInt(X);
+    else return AnyToInt(X).reverse();
 }
 
 bool operator <(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
