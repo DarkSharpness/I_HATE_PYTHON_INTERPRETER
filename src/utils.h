@@ -1,7 +1,6 @@
 #ifndef UTILS_H_
 #define UTILS_H_
 
-#include "Number.cc"
 #include "support/Any.h"
 #include "Python3BaseVisitor.h"
 #include <string>
@@ -61,27 +60,19 @@ enum Flow_Type {
 
 
 
-bool isFirstChar(char _ch);
-
-void getVariable(antlrcpp::Any &tmp);
-
-bool isValidChar(char _ch);
-
-bool validateVarName(const std::string& name);
-
 double StringToFloat(const std::string &str);
 
-int2048_t StringToInt(const std::string &str);
+// int2048_t StringToInt(const std::string &str);
 
 bool StringToBool(const std::string &str);
 
-std::string IntToString(int2048_t tmp);
+// std::string IntToString(int2048_t tmp);
 
 bool AnyToBool(const antlrcpp::Any &Var);
 
 double AnyToDouble(const antlrcpp::Any &Var);
 
-int2048_t AnyToInt(const antlrcpp::Any &Var);
+// int2048_t AnyToInt(const antlrcpp::Any &Var);
 
 std::string AnyToString(const antlrcpp::Any &Var);
 

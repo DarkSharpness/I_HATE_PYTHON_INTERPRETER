@@ -6,48 +6,81 @@
 #include "support/Any.h"
 #include "utils.h"
 #include <cmath>
+#include "Number.cc"
 #include <ostream>
+
 
 NameSpace scope;
 
-
-
-
-/// @brief Judge whether it's a valid first char.
-bool isFirstChar(char _ch) {
-    return (_ch >= 'a' && _ch <= 'z') ||
-           (_ch >= 'A' && _ch <= 'Z');
+/// @brief Change string into int2048_t type. 
+int2048_t StringToInt(const std::string &str) {
+    return int2048_t(str);
 }
 
-/// @brief Judge whether it's a valid char.
-bool isValidChar(char _ch) {
-    return (_ch >= 'a' && _ch <= 'z') ||
-           (_ch >= 'A' && _ch <= 'Z') ||
-           (_ch == '_') || isdigit(_ch);
+/// @brief Change string into double type.
+double StringToFloat(const std::string &str) {
+    return std::stod(str);
 }
 
-/// @brief Judge whether it's a valid name. 
-bool validateVarName(const std::string& Name) {
-    if(!isFirstChar(Name.front())) return false;
-    for(const auto &iter : KeyWords) {
-        if(iter == Name) return false;
-    }
-    for(size_t i = 1 ; i < Name.length() ; ++i) {
-        if(!isValidChar(Name[i])) return false;
-    }
-    return true;
+
+/// @brief Change string into bool type
+bool StringToBool(const std::string &str) {
+    return !str.empty();
 }
+
+std::string IntToString(const int2048_t &tmp) {
+    return tmp._TOSTRING();
+}
+
+double IntToFloat(const int2048_t &tmp) {
+    return double(tmp);
+}
+
+bool IntToBool(const int2048_t &tmp) {
+    return bool(tmp);
+}
+
+std::string FloatToString(double tmp) {
+    return std::to_string(tmp);
+}
+
+int2048_t FloatToInt(double tmp) {
+    return sjtu::dto2048(tmp);
+}
+
+bool FloatToBool(double tmp) {
+    return tmp;
+}
+
+
+std::string boolToString(bool tmp) {
+    static const std::string str[2] = {"True","False"};
+    return str[tmp];
+}
+
+int2048_t boolToInt(bool tmp) {
+    return int2048_t(tmp);
+}
+
+double boolToFloat(bool tmp) {
+    return tmp;
+}
+
+
+
+
+
 
 /// @brief Change ANY variable into bool type
 bool AnyToBool(const antlrcpp::Any &Var) {
     if(Var.is<bool>()) {
         return Var.as<bool>();
     } else if(Var.is<int2048_t>()) {
-        return bool(Var.as<int2048_t>());
+        return IntToBool(Var.as<int2048_t>());
     } else if(Var.is<double>()) {
-        return bool(Var.as<double>());
+        return FloatToBool(Var.as<double>());
     } else {/*Var.as<std::string>*/
-        return !bool(Var.as<std::string>().empty());
+        return StringToBool(Var.as<std::string>());
     }
 }
 
@@ -56,9 +89,9 @@ double AnyToDouble(const antlrcpp::Any &Var) {
     if(Var.is<double>()) {
         return Var.as<double>();
     } else if(Var.is<int2048_t>()) {
-        return double(Var.as<int2048_t>());
+        return IntToFloat(Var.as<int2048_t>());
     } else if(Var.is<bool>()) {
-        return double(Var.as<bool>());
+        return boolToFloat(Var.as<bool>());
     } else {/*Var.as<std::string>*/
         return StringToFloat(Var.as<std::string>());
     }
@@ -69,9 +102,9 @@ int2048_t AnyToInt(const antlrcpp::Any &Var) {
     if(Var.is<int2048_t>()) {
         return Var.as<int2048_t>();
     } else if(Var.is<double>()) {
-        return int2048_t(Var.as<double>());
+        return FloatToInt(Var.as<double>());
     } else if(Var.is<bool>()) {
-        return int2048_t(Var.as<bool>());
+        return boolToInt(Var.as<bool>());
     } else {/*Var.as<std::string>*/
         return StringToInt(Var.as<std::string>());
     }
@@ -84,54 +117,16 @@ std::string AnyToString(const antlrcpp::Any &Var) {
     } else if(Var.is<int2048_t>()) {
         return IntToString(Var.as<int2048_t>());
     } else if(Var.is<double>()) {
-        return std::to_string(Var.as<double>());
+        return FloatToString(Var.as<double>());
     } else {
-        return Var.as<bool>() ? "True" : "False";
+        return boolToString(Var.as<bool>());
     }
 }
 
 
-/// @brief Change string into double type.
-double StringToFloat(const std::string &str) {
-    return std::stod(str);
-}
-
-/// @brief Change string into int2048_t type. 
-int2048_t StringToInt(const std::string &str) {
-    // TODO : RE-write in int2048
-    // int2048 have built in functions
-
-    //std::cout << str << "INT_CONVERSION\n";
-    int2048_t ans = 0;
-    bool flag = false;
-    for(char _ch : str) {
-        if(_ch == '-') flag ^= true; 
-        if(!isdigit(_ch)) continue;
-        ans = ans * 10 + (_ch ^ '0');
-    }
-    return flag ? -ans : ans;
-}
-
-/// @brief Change string into bool type
-bool StringToBool(const std::string &str) {
-    return !str.empty();
-}
 
 
-std::string IntToString(int2048_t tmp) {
-    if(tmp == 0) {return "0";}
-    std::string str;
-    if(tmp < 0) {
-        tmp = -tmp; // can be optimized
-        str.push_back('-');
-    }
-    while(tmp) {
-        str.push_back((tmp % 10) ^ '0');
-        tmp /= 10;
-    }
-    std::reverse(str.begin() + (str[0] == '-'),str.end());
-    return str;
-}
+
 
 
 
@@ -144,7 +139,7 @@ antlrcpp::Any operator +(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
         return AnyToInt(X) + AnyToInt(Y);
     }
 }
-// TODO
+
 antlrcpp::Any& operator +=(antlrcpp::Any &X,const antlrcpp::Any &Y) {
     return X = X + Y;
 }
@@ -198,8 +193,8 @@ antlrcpp::Any operator *(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
     if(X.is<std::string>() || Y.is<std::string>()) {
         const std::string &str = X.is<std::string>() ? X.as<std::string>(): 
                                                        Y.as<std::string>();
-        int len = int(X.is<std::string>() ? Y.as<int2048_t>():
-                                            X.as<int2048_t>());
+        size_t len = size_t(X.is<std::string>() ? Y.as<int2048_t>():
+                                                  X.as<int2048_t>());
         std::string ans;
         ans.reserve(str.size() * len);
         while(len--) {ans.append(str);}
@@ -264,10 +259,7 @@ antlrcpp::Any& operator /=(antlrcpp::Any &X,const antlrcpp::Any &Y) {
 
 
 antlrcpp::Any operator |(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
-    auto tmp1 = AnyToInt(X),tmp2 = AnyToInt(Y);
-    auto ans = tmp1 % tmp2;
-    ans = ans >=0 ? ans : ans + abs(tmp2);
-    return (tmp1 - ans) / tmp2;
+    return AnyToInt(X) / AnyToInt(Y);
 }
 
 antlrcpp::Any& operator |=(antlrcpp::Any &X,const antlrcpp::Any &Y) {
@@ -288,9 +280,7 @@ antlrcpp::Any& operator |=(antlrcpp::Any &X,const antlrcpp::Any &Y) {
 
 
 antlrcpp::Any operator %(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
-    auto tmp = AnyToInt(Y);
-    auto ans = AnyToInt(X) % tmp;
-    return ans >= 0 ? ans : ans + abs(tmp) ;
+    return AnyToInt(X) % AnyToInt(Y);
 }
 
 
