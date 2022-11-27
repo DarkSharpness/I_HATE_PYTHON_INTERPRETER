@@ -23,25 +23,28 @@ struct Para_Type {
     Para_Type(const std::string &str,const antlrcpp::Any &v):name(str),val(v){}
 };
 
-// struct None_Type {};
 
-// Basic Function type.
+
+struct None_Type {};
+
 struct function {
     Python3Parser::SuiteContext *ptr;
-    std::vector  <Para_Type> paraVec;
+    std::vector <Para_Type> paraVec;
 };
 
+struct Return_List : public std::vector <antlrcpp::Any> {};
+
 struct Return_Type {
-    antlrcpp::Any data;
+    Return_List data;
+    // antlrcpp::Any data;
 };
 
 // Data of Keyword Postioning
-struct Keyword_Position {
+struct Argument {
     std::string keyword;
     antlrcpp::Any value;
 };
 
-struct No_Return {};
 
 /// @brief Record all the keywords.
 const std::string KeyWords[] = {
@@ -59,6 +62,8 @@ enum Flow_Type {
     BREAK_CASE,
     CONTINUE_CASE,
 };
+
+
 
 
 antlrcpp::Any operator +(const antlrcpp::Any &X,const antlrcpp::Any &Y);
@@ -82,10 +87,11 @@ antlrcpp::Any& operator |=(antlrcpp::Any &X,const antlrcpp::Any &Y);
 antlrcpp::Any operator %(const antlrcpp::Any &X,const antlrcpp::Any &Y);
 antlrcpp::Any& operator %=(antlrcpp::Any &X,const antlrcpp::Any &Y);
 
+antlrcpp::Any operator -(const antlrcpp::Any &X);
 antlrcpp::Any operator -(antlrcpp::Any &&X);
 
-bool operator < (const antlrcpp::Any &X,const antlrcpp::Any &Y);
-bool operator > (const antlrcpp::Any &X,const antlrcpp::Any &Y);
+bool operator <(const antlrcpp::Any &X,const antlrcpp::Any &Y);
+bool operator >(const antlrcpp::Any &X,const antlrcpp::Any &Y);
 bool operator <=(const antlrcpp::Any &X,const antlrcpp::Any &Y);
 bool operator >=(const antlrcpp::Any &X,const antlrcpp::Any &Y);
 bool operator !=(const antlrcpp::Any &X,const antlrcpp::Any &Y);

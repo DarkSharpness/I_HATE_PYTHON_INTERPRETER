@@ -1,4 +1,4 @@
-// Generated from /mnt/f/Code/Python_Interpreter_-Too-_EZ/Python-Interpreter-2022-main/generated/Python3.g4 by ANTLR 4.9.2
+// Generated from /mnt/f/Code/Github/I_HATE_PYTHON_INTERPRETER/generated/Python3.g4 by ANTLR 4.9.2
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;

@@ -193,7 +193,8 @@ class int2048 : public array <uint64_t>  {
             emplace_back(0);
             return;
         }
-        uint64_t i = str.size();
+        uint64_t i = str.find('.');
+        if(i == std::string::npos) i = str.size();
         reserve(1 + (i - j) / baseBit);
         uint64_t cnt  = 0;
         uint64_t ret  = 0;

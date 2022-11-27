@@ -12,7 +12,8 @@
 
 NameSpace scope;
 
-std::unordered_map <std::string,function> funcScope;
+
+static const std::string boolMap[2] = {"False","True"};
 
 
 /// @brief Change string into int2048_t type. 
@@ -57,8 +58,7 @@ bool FloatToBool(double tmp) {
 
 
 std::string boolToString(bool tmp) {
-    static const std::string str[2] = {"True","False"};
-    return str[tmp];
+    return boolMap[tmp];
 }
 
 int2048_t boolToInt(bool tmp) {
@@ -82,8 +82,10 @@ bool AnyToBool(const antlrcpp::Any &Var) {
         return IntToBool(Var.as<int2048_t>());
     } else if(Var.is<double>()) {
         return FloatToBool(Var.as<double>());
-    } else {/*Var.as<std::string>*/
+    } else if(Var.is<std::string>()) {
         return StringToBool(Var.as<std::string>());
+    } else {
+        return 0;
     }
 }
 
@@ -95,8 +97,10 @@ double AnyToDouble(const antlrcpp::Any &Var) {
         return IntToFloat(Var.as<int2048_t>());
     } else if(Var.is<bool>()) {
         return boolToFloat(Var.as<bool>());
-    } else {/*Var.as<std::string>*/
+    } else if(Var.is<std::string>()) {
         return StringToFloat(Var.as<std::string>());
+    } else {
+        return 0;
     }
 }
 
@@ -108,8 +112,10 @@ int2048_t AnyToInt(const antlrcpp::Any &Var) {
         return FloatToInt(Var.as<double>());
     } else if(Var.is<bool>()) {
         return boolToInt(Var.as<bool>());
-    } else {/*Var.as<std::string>*/
+    } else if(Var.is<std::string>()) {
         return StringToInt(Var.as<std::string>());
+    } else {
+        return 0;
     }
 }
 
@@ -121,13 +127,12 @@ std::string AnyToString(const antlrcpp::Any &Var) {
         return IntToString(Var.as<int2048_t>());
     } else if(Var.is<double>()) {
         return FloatToString(Var.as<double>());
-    } else {
+    } else if(Var.is<bool>()) {
         return boolToString(Var.as<bool>());
+    } else {
+        return "None";
     }
 }
-
-
-
 
 
 
@@ -143,27 +148,6 @@ antlrcpp::Any operator +(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
     }
 }
 
-antlrcpp::Any& operator +=(antlrcpp::Any &X,const antlrcpp::Any &Y) {
-    return X = X + Y;
-}
-
-/*
-antlrcpp::Any& operator +=(antlrcpp::Any &X,const antlrcpp::Any &Y) {
-    if(X.is<std::string>() || Y.is<std::string>()) {
-        X.as<std::string>() += Y.as<std::string>();
-    } else if(X.is<double>()) {
-        X.as<double>() += AnyToDouble(Y);
-    } else if(Y.is<double>()) {
-        X = AnyToDouble(X) + Y.as<double>();
-    } else if(X.is<int2048_t>()) {
-        X.as<int2048_t>() += AnyToInt(Y);
-    } else {
-        X = X.as<bool>() + AnyToInt(Y);
-    }
-    return X;
-}
-*/
-
 
 antlrcpp::Any operator -(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
     if(X.is<double>() || Y.is<double>()) {
@@ -173,31 +157,23 @@ antlrcpp::Any operator -(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
     }
 }
 
+
 antlrcpp::Any& operator -=(antlrcpp::Any &X,const antlrcpp::Any &Y) {
     return X = X - Y;
 }
-/*
-antlrcpp::Any& operator -=(antlrcpp::Any &X,const antlrcpp::Any &Y) {
-    if(X.is<double>()) {
-        X.as<double>() -= AnyToDouble(Y);
-    } else if(Y.is<double>()){
-        X = AnyToDouble(X) - Y.as<double>();
-    } else if(X.is<int2048_t>()){
-        X.as<int2048_t>() -= AnyToInt(Y);
-    } else {
-        X = X.as<bool>() - AnyToInt(Y);
-    }
-    return X;
-}
-*/
 
 
 antlrcpp::Any operator *(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
-    if(X.is<std::string>() || Y.is<std::string>()) {
-        const std::string &str = X.is<std::string>() ? X.as<std::string>(): 
-                                                       Y.as<std::string>();
-        size_t len = size_t(X.is<std::string>() ? Y.as<int2048_t>():
-                                                  X.as<int2048_t>());
+    if(X.is<std::string>()) {
+        const std::string &str = X.as<std::string>();
+        size_t len = size_t(AnyToInt(Y));
+        std::string ans;
+        ans.reserve(str.size() * len);
+        while(len--) {ans.append(str);}
+        return ans;
+    } else if(Y.is<std::string>()){
+        const std::string &str = Y.as<std::string>();
+        size_t len = size_t(AnyToInt(X));
         std::string ans;
         ans.reserve(str.size() * len);
         while(len--) {ans.append(str);}
@@ -209,77 +185,15 @@ antlrcpp::Any operator *(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
     }
 }
 
-antlrcpp::Any& operator *=(antlrcpp::Any &X,const antlrcpp::Any &Y) {
-    return X = X * Y;
-}
-
-
-/*
-antlrcpp::Any& operator *=(antlrcpp::Any &X,const antlrcpp::Any &Y) {
-    if(X.is<std::string>() || Y.is<std::string>()) {
-        const std::string &str = X.is<std::string>() ? X.as<std::string>(): 
-                                                       Y.as<std::string>();
-        int len = int(X.is<std::string>() ? Y.as<int2048_t>():
-                                            X.as<int2048_t>());
-        std::string ans;
-        ans.reserve(str.size() * len);
-        while(len--) {ans.append(str);}
-        X = ans;        
-    } else if(X.is<double>()) {
-        X.as<double>() *= AnyToDouble(Y);
-    } else if(Y.is<double>()) {
-        X = AnyToDouble(X) * Y.as<double>(); 
-    } else if(X.is<int2048_t>()) {
-        X.as<int2048_t>() *= AnyToInt(Y);
-    } else {
-        X = X.as<bool>() * AnyToInt(Y); 
-    }
-    return X;
-}
-*/
-
 
 antlrcpp::Any operator /(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
     return AnyToDouble(X) / AnyToDouble(Y);
 }
 
 
-antlrcpp::Any& operator /=(antlrcpp::Any &X,const antlrcpp::Any &Y) {
-    return X = X / Y;
-}
-
-
-/*
-antlrcpp::Any& operator /=(antlrcpp::Any &X,const antlrcpp::Any &Y) {
-    if(X.is<double>()) {
-        X.as<double>() /= AnyToDouble(Y);
-    } else {
-        X = X / Y;
-    }
-    return X;
-}
-*/
-
-
 antlrcpp::Any operator |(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
     return AnyToInt(X) / AnyToInt(Y);
 }
-
-antlrcpp::Any& operator |=(antlrcpp::Any &X,const antlrcpp::Any &Y) {
-    return X = X | Y;
-}
-
-
-/*
-antlrcpp::Any& operator |=(antlrcpp::Any &X,const antlrcpp::Any &Y) {
-    if(X.is<int2048_t>()) {
-        X.as<int2048_t>() /= AnyToInt(Y);    
-    } else {
-        X = X | Y;
-    }
-    return X;
-}
-*/
 
 
 antlrcpp::Any operator %(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
@@ -287,36 +201,18 @@ antlrcpp::Any operator %(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
 }
 
 
-antlrcpp::Any& operator %=(antlrcpp::Any &X,const antlrcpp::Any &Y) {
-    return X = X % Y;
-}
-
-/*
-antlrcpp::Any& operator %=(antlrcpp::Any &X,const antlrcpp::Any &Y) {
-    if(X.is<int2048_t>()) {
-        X.as<int2048_t>() %= AnyToInt(Y);    
-    } else {
-        X = X % Y;
-    }
-    return X;
-}
-*/
-
-
 antlrcpp::Any operator -(antlrcpp::Any &&X) {
     if(X.is<double>()) return -X.as<double>();
     else return AnyToInt(X).reverse();
 }
 
+
 bool operator <(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
     if(X.is<std::string>() || Y.is<std::string>()) {
-        // std::cout <<"COMP_STR\n";
         return X.as<std::string>() < Y.as<std::string>();
     } else if(X.is<double>() || Y.is<double>()) {
-        // std::cout <<"COMP_DB\n";
         return AnyToDouble(X) < AnyToDouble(Y);
     } else {
-        // std::cout <<"COMP_INT\n";
         return AnyToInt(X) < AnyToInt(Y);
     }
 }
@@ -325,16 +221,24 @@ bool operator <(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
 bool operator >(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
     return Y < X;
 }
+
 bool operator <=(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
     return !(Y < X);
 }
+
 bool operator >=(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
     return !(X < Y);
 }
+
 bool operator !=(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
     return !(X == Y);
 }
+
 bool operator ==(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
+    if(X.is<None_Type>() || Y.is<None_Type>()) {
+        return X.is<None_Type>() && Y.is<None_Type>();
+    }
+
     if(X.is<std::string>() || Y.is<std::string>()) {
         if(!Y.is<std::string>() || ! X.is<std::string>()) {
             return false;
@@ -348,18 +252,23 @@ bool operator ==(const antlrcpp::Any &X,const antlrcpp::Any &Y) {
 }
 
 
-
 std::ostream& operator <<(std::ostream& os,const antlrcpp::Any &X) {
     if(X.is<int2048_t>())        {os << X.as<int2048_t>();}
     else if(X.is<std::string>()) {os << X.as<std::string>();}
-    else if(X.is<double>())      {os << X.as<double>();}
+    else if(X.is<double>())      {printf("%.6lf",X.as<double>());}
     else if(X.is<bool>()) {
-        os << (X.as<bool>() ? "True" : "False");
-    } else {
+        os << boolMap[X.as<bool>()];
+    } else if(X.is<None_Type>()){
         os << "None";
-    } // UNEXPECTED ERROR
+    }
     return os;
 }
 
+
+antlrcpp::Any& operator +=(antlrcpp::Any &X,const antlrcpp::Any &Y) {return X = X + Y;}
+antlrcpp::Any& operator %=(antlrcpp::Any &X,const antlrcpp::Any &Y) {return X = X % Y;}
+antlrcpp::Any& operator |=(antlrcpp::Any &X,const antlrcpp::Any &Y) {return X = X | Y;}
+antlrcpp::Any& operator /=(antlrcpp::Any &X,const antlrcpp::Any &Y) {return X = X / Y;}
+antlrcpp::Any& operator *=(antlrcpp::Any &X,const antlrcpp::Any &Y) {return X = X * Y;}
 
 #endif

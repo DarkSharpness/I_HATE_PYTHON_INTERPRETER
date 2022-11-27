@@ -6,11 +6,9 @@ using namespace sjtu;
 
 signed main() {
     int2048 x,y;
-    freopen("test.in","r",stdin);
-    cin >> x >> y;
-    freopen("CON","r",stdin);
-    // cout << "pass\n";
-    // cout << x * y << '\n';
-    cout << x % y;
+    // freopen("test.in","r",stdin);
+    double t;
+    cin >> t;
+    cout << dto2048(t) << '\n';
     return 0;
 }
