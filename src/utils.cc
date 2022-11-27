@@ -12,6 +12,9 @@
 
 NameSpace scope;
 
+std::unordered_map <std::string,function> funcScope;
+
+
 /// @brief Change string into int2048_t type. 
 int2048_t StringToInt(const std::string &str) {
     return int2048_t(str);
@@ -352,9 +355,9 @@ std::ostream& operator <<(std::ostream& os,const antlrcpp::Any &X) {
     else if(X.is<double>())      {os << X.as<double>();}
     else if(X.is<bool>()) {
         os << (X.as<bool>() ? "True" : "False");
-    } else if(X.is<None_Type>()){
+    } else {
         os << "None";
-    }else {os << "FUCKING ERORR IN UTILS.CC";} // UNEXPECTED ERROR
+    } // UNEXPECTED ERROR
     return os;
 }
 
